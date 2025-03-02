@@ -1,0 +1,38 @@
+<!-- src/app/main-content/main-content.component.html -->
+<div class="main-content">
+  <h2>Welcome, Anagha!</h2>
+
+  <!-- Dashboard Stats (Restored) -->
+  <div class="dashboard-stats">
+    <div class="stat-card" *ngFor="let stat of dashboardStats">
+      <img [src]="stat.imageUrl" alt="{{ stat.title }}">
+      <div>
+        <h3>{{ stat.title }}</h3>
+        <p>{{ stat.count }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Arrivals & Upcoming Events (Side-by-Side) -->
+  <div class="content-container">
+    <div class="new-arrivals">
+      <h3>New Arrivals</h3>
+      <div class="book-list">
+        <div class="book" *ngFor="let book of newArrivals">
+          <img [src]="book.imageUrl" alt="{{ book.title }}">
+          <p class="book-title">{{ book.title }}</p>
+          <p class="book-author">{{ book.author }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="upcoming-events">
+      <h3>Upcoming Events</h3>
+      <div class="event" *ngFor="let event of upcomingEvents" [ngStyle]="{ 'border-left': '4px solid ' + event.color }">
+        <h4>{{ event.title }}</h4>
+        <p>{{ event.dayTime }}</p>
+        <span>{{ event.date }}</span>
+      </div>
+    </div>
+  </div>
+</div>

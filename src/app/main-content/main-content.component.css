@@ -1,0 +1,113 @@
+/* src/app/main-content/main-content.component.css */
+
+.main-content {
+  background-color: #bc90c9;
+  padding: 1.5rem;
+  width: 100vw; /* Full viewport width */
+  min-height: 100vh; /* Ensure full height for larger screens */
+}
+
+/* Dashboard Stats */
+.dashboard-stats {
+  display: flex;
+  gap:20px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  width: 15%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card img {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+}
+
+/* Content Container (New Arrivals & Upcoming Events Side-by-Side) */
+.content-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* New Arrivals */
+.new-arrivals {
+  width: 50%;
+}
+
+.book-list {
+  display: flex;
+  overflow-x: auto;
+  gap: 15px;
+  padding: 10px;
+}
+
+.book {
+  text-align: center;
+  width: 120px;
+}
+
+.book img {
+  width: 100px;
+  height: 140px;
+  border-radius: 5px;
+}
+
+.book-title {
+  font-weight: bold;
+}
+
+.book-author {
+  color: gray;
+  font-size: 0.9em;
+}
+
+/* Upcoming Events (Beside New Arrivals) */
+.upcoming-events {
+  margin-right:500px;
+  width: 30%;
+}
+
+.event {
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.event h4 {
+  margin: 0;
+  font-size: 1em;
+}
+
+.event p {
+  margin: 5px 0;
+  font-size: 0.9em;
+}
+
+.event span {
+  font-size: 0.85em;
+  color: gray;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .content-container {
+    flex-direction: column;
+  }
+
+  .new-arrivals,
+  .upcoming-events {
+    width: 100%;
+  }
+}

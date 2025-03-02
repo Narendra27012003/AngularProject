@@ -1,0 +1,14 @@
+/* src/app/app.component.css */
+
+.layout-container {
+  display: flex;
+  flex-direction: row;
+  min-height: calc(100vh - 70px); /* subtract header height */
+}
+
+/* Responsive for smaller screens */
+@media (max-width: 768px) {
+  .layout-container {
+    flex-direction: column;
+  }
+}

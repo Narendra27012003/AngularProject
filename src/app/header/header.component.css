@@ -1,0 +1,67 @@
+/* src/app/header/header.component.css */
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fff;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  height: 70px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.nie-logo {
+  height: 40px;
+  margin-right: 0.75rem;
+}
+
+.site-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.search-bar input {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #ccc;
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  outline: none;
+}
+
+.search-bar button {
+  background-color: #ccc;
+  border: 1px solid #ccc;
+  border-radius: 0 4px 4px 0;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+}
+
+.icons button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 0.75rem;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.icons button:hover {
+  color: #555;
+}

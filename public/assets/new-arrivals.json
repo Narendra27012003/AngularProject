@@ -1,0 +1,27 @@
+[
+  {
+    "title": "What If?",
+    "author": "Randall Munroe",
+    "imageUrl": "https://m.media-amazon.com/images/I/417WXF3f2HL.jpg"
+  },
+  {
+    "title": "Milk and Honey",
+    "author": "Rupi Kaur",
+    "imageUrl": "https://4.imimg.com/data4/KK/QE/MY-21939098/computer-science-engineering-handbook-1000x1000.jpg"
+  },
+  {
+    "title": "Scope & Closures",
+    "author": "Kyle Simpson, 2014",
+    "imageUrl": "https://engineeringbookstore.in/wp-content/uploads/2023/02/aj-2024.jpg"
+  },
+  {
+    "title": "A Very Short Introduction",
+    "author": "Margaret A. Boden",
+    "imageUrl": "https://content.packt.com/_/image/original/B15534/cover_image.jpg"
+  },
+  {
+    "title": "Sprint: Solve Big Problems",
+    "author": "Jake Knapp",
+    "imageUrl": "https://static.scientificamerican.com/sciam/cache/file/1DDFE633-2B85-468D-B28D05ADAE7D1AD8_source.jpg?w=1200"
+  }
+]

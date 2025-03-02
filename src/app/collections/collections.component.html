@@ -1,0 +1,9 @@
+<div class="collections-container">
+  <h2>Collection</h2>
+  <div class="collections-grid">
+    <div class="collection-item" *ngFor="let item of collections">
+      <img [src]="item.imageUrl" alt="{{ item.title }}">
+      <p>{{ item.title }}</p>
+    </div>
+  </div>
+</div>
