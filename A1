@@ -1,0 +1,145 @@
+To achieve this, we need to split the databases array into two rows:
+
+1. First row (Top section)
+
+
+2. Second row (Bottom section)
+
+
+
+
+---
+
+Solution
+
+Modify e-database.component.ts to split the array into two parts:
+
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-e-database',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './e-database.component.html',
+  styleUrls: ['./e-database.component.css']
+})
+export class EDatabaseComponent {
+  databases = [
+    { title: 'IEEE (ASPP) Journals', imageUrl: 'https://cdn-icons-png.flaticon.com/512/6065/6065536.png' },
+    { title: 'J-GATE Complete Database (Journals)', imageUrl: 'https://cdn-icons-png.flaticon.com/512/2995/2995456.png' },
+    { title: 'Elsevier Science Direct', imageUrl: 'https://cdn-icons-png.flaticon.com/512/2204/2204342.png' },
+    { title: 'ASCE', imageUrl: 'https://cdn-icons-png.flaticon.com/512/4825/4825066.png' },
+    { title: 'ASCE (New)', imageUrl: 'https://cdn-icons-png.flaticon.com/512/4804/4804692.png' },
+    { title: 'Manupatra Online', imageUrl: 'https://cdn-icons-png.flaticon.com/512/1653/1653492.png' }
+  ];
+
+  databasesSecondRow = [
+    { title: 'AIR Online', imageUrl: 'https://cdn-icons-png.flaticon.com/512/1055/1055641.png' },
+    { title: 'Prowess IQ (Interactive Querying) II', imageUrl: 'https://cdn-icons-png.flaticon.com/512/4101/4101452.png' },
+    { title: 'Prowess IQ (Interactive Querying)', imageUrl: 'https://cdn-icons-png.flaticon.com/512/2566/2566431.png' },
+    { title: 'E-Shodh Sindhu', imageUrl: 'https://cdn-icons-png.flaticon.com/512/4332/4332654.png' },
+    { title: 'E-Shodh Sindhu II', imageUrl: 'https://cdn-icons-png.flaticon.com/512/3089/3089233.png' },
+    { title: 'Previous Year Papers', imageUrl: 'https://cdn-icons-png.flaticon.com/512/1781/1781283.png' }
+  ];
+}
+
+
+---
+
+Modify e-database.component.html
+
+Use two separate divs to print them in two rows.
+
+<div class="e-database-container">
+  <h2>E-Books (Database)</h2>
+
+  <!-- First Row -->
+  <div class="database-grid">
+    <div class="database-item" *ngFor="let db of databases">
+      <img [src]="db.imageUrl" alt="{{ db.title }}">
+      <p>{{ db.title }}</p>
+    </div>
+  </div>
+
+  <!-- Second Row (Displayed Below) -->
+  <div class="database-grid second-row">
+    <div class="database-item" *ngFor="let db of databasesSecondRow">
+      <img [src]="db.imageUrl" alt="{{ db.title }}">
+      <p>{{ db.title }}</p>
+    </div>
+  </div>
+</div>
+
+
+---
+
+Modify e-database.component.css for Proper Spacing
+
+.e-database-container {
+  padding: 20px;
+  background-color: #f5e1ff;
+  min-height: 100vh;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #4B0082; /* Deep Purple */
+}
+
+.database-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+/* Add margin to separate rows */
+.second-row {
+  margin-top: 30px;
+}
+
+.database-item {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.database-item img {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 10px;
+}
+
+.database-item p {
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .database-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+
+---
+
+🚀 Final Output
+
+✅ The first 6 items will appear in Row 1
+✅ The remaining 6 items will appear below in Row 2
+✅ Proper spacing ensures a clean look
+✅ Responsive layout works on all screens
+
+Now, your E-Database component matches the required format! 🎉
+
+Let me know if you need any more modifications! 😊
+
