@@ -1,0 +1,136 @@
+Here is an improved CSS styling for the students table and overdue charges table to make them look more attractive, structured, and responsive.
+
+
+---
+
+🔹 1. Update table.component.css (Shared Table Styles)
+
+Since we are using a shared table component, the styling will automatically apply to both Students and Overdue Charges.
+
+/* Table Container */
+.table-container {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  overflow-x: auto;
+}
+
+/* Table Styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+  background: white;
+}
+
+/* Table Headers */
+th {
+  background-color: #6A5ACD; /* Nice Purple Shade */
+  color: white;
+  padding: 12px;
+  text-align: left;
+  font-size: 16px;
+}
+
+/* Table Rows */
+td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Hover Effect */
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Student Image */
+.student-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  th, td {
+    font-size: 12px;
+    padding: 10px;
+  }
+  .table-container {
+    padding: 10px;
+  }
+}
+
+
+---
+
+🔹 2. Update students.component.css
+
+This ensures the student table section looks clean and structured.
+
+.students-container {
+  padding: 20px;
+  background-color: #f5e1ff;
+  min-height: 100vh;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #4B0082; /* Deep Purple */
+}
+
+
+---
+
+🔹 3. Update overdue-charges.component.css
+
+This ensures the Overdue Charges table looks aligned with the theme.
+
+.overdue-container {
+  padding: 20px;
+  background-color: #f8e7e7;
+  min-height: 100vh;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #B22222; /* Dark Red */
+}
+
+
+---
+
+🔹 4. Final Touches
+
+Now, both Students and Overdue Charges will use the same table design but with a consistent and attractive UI.
+
+✅ Table now has:
+✔ Rounded corners
+✔ Shadows for a modern look
+✔ Hover effect
+✔ Smooth background color
+✔ Responsive design
+
+
+---
+
+🚀 Result
+
+Students Table will have a purple theme
+
+Overdue Charges Table will have a red theme
+
+
+Now, both tables look professional, clean, and responsive across all devices! 🎉
+
+Let me know if you need any adjustments! 😊
+
