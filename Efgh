@@ -1,0 +1,211 @@
+To reuse the existing students table for displaying Overdue Charges, follow these steps:
+
+
+---
+
+1. Modify Sidebar Navigation (sidebar.component.html)
+
+Update the routerLink for Overdue Charges:
+
+<li><a routerLink="/overdue-charges" routerLinkActive="active"><i class="fa fa-exclamation-triangle"></i> Overdue Charges</a></li>
+
+
+---
+
+2. Create a Reusable Table Component (table.component.ts)
+
+Instead of creating separate tables for Students and Overdue Charges, we will create a TableComponent that accepts data dynamically.
+
+Run the command:
+
+ng generate component shared/table --standalone
+
+Modify table.component.ts:
+
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-table',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './table.component.html',
+  styleUrls: ['./table.component.css']
+})
+export class TableComponent {
+  @Input() data: any[] = [];
+  @Input() columns: { key: string, label: string }[] = [];
+}
+
+
+---
+
+3. Update Table UI (table.component.html)
+
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th *ngFor="let col of columns">{{ col.label }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of data">
+        <td *ngFor="let col of columns">{{ row[col.key] }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+---
+
+4. Modify students.component.ts to Use the Table
+
+Modify students.component.ts so that it uses the TableComponent:
+
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { TableComponent } from '../shared/table.component';
+
+@Component({
+  selector: 'app-students',
+  standalone: true,
+  imports: [CommonModule, TableComponent],
+  templateUrl: './students.component.html',
+  styleUrls: ['./students.component.css']
+})
+export class StudentsComponent {
+  studentColumns = [
+    { key: 'name', label: 'Name' },
+    { key: 'prn', label: 'PRN No.' },
+    { key: 'dept', label: 'Dept' },
+    { key: 'email', label: 'Email' },
+    { key: 'phone', label: 'Phone' },
+    { key: 'registrationDate', label: 'Registration Date' }
+  ];
+
+  students = [
+    { name: 'Neha Mishra', prn: 'MITU22BFAAT035', dept: 'SoFA', email: 'nehamishra@gmail.com', phone: '9254876325', registrationDate: '30 Jul, 2024' },
+    { name: 'Gejasvi Dewhare', prn: 'MITU23BFAAT021', dept: 'SoFA', email: 'geju28@gmail.com', phone: '9325349875', registrationDate: '28 Jul, 2024' },
+    { name: 'Ayushi Dawande', prn: 'MITU21BFAAT035', dept: 'SoFA', email: 'dawande17@gmail.com', phone: '8854216378', registrationDate: '28 Jul, 2024' }
+  ];
+}
+
+
+---
+
+5. Modify students.component.html
+
+Replace the static table with the reusable <app-table> component:
+
+<div class="students-container">
+  <h2>Student Accounts</h2>
+  <app-table [data]="students" [columns]="studentColumns"></app-table>
+</div>
+
+
+---
+
+6. Create OverdueChargesComponent
+
+Run:
+
+ng generate component overdue-charges --standalone
+
+Modify overdue-charges.component.ts:
+
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { TableComponent } from '../shared/table.component';
+
+@Component({
+  selector: 'app-overdue-charges',
+  standalone: true,
+  imports: [CommonModule, TableComponent],
+  templateUrl: './overdue-charges.component.html',
+  styleUrls: ['./overdue-charges.component.css']
+})
+export class OverdueChargesComponent {
+  overdueColumns = [
+    { key: 'name', label: 'Name' },
+    { key: 'bookTitle', label: 'Book Title' },
+    { key: 'dueDate', label: 'Due Date' },
+    { key: 'returnDate', label: 'Return Date' },
+    { key: 'fineAmount', label: 'Fine Amount' }
+  ];
+
+  overdueCharges = [
+    { name: 'Neha Mishra', bookTitle: 'Theory of Everything', dueDate: '15 Jan, 2024', returnDate: '20 Jan, 2024', fineAmount: '₹50' },
+    { name: 'Ayushi Dawande', bookTitle: 'Angular for Beginners', dueDate: '10 Jan, 2024', returnDate: '15 Jan, 2024', fineAmount: '₹30' },
+    { name: 'Ronak Shukla', bookTitle: 'Machine Learning Guide', dueDate: '5 Jan, 2024', returnDate: '10 Jan, 2024', fineAmount: '₹20' }
+  ];
+}
+
+
+---
+
+7. Modify overdue-charges.component.html
+
+<div class="overdue-container">
+  <h2>Overdue Charges</h2>
+  <app-table [data]="overdueCharges" [columns]="overdueColumns"></app-table>
+</div>
+
+
+---
+
+8. Update Routing (app.routes.ts)
+
+Add the OverdueChargesComponent:
+
+import { Routes } from '@angular/router';
+import { MainContentComponent } from './main-content/main-content.component';
+import { CollectionsComponent } from './collections/collections.component';
+import { StudentsComponent } from './students/students.component';
+import { OverdueChargesComponent } from './overdue-charges/overdue-charges.component';
+
+export const routes: Routes = [
+  { path: '', component: MainContentComponent },
+  { path: 'collections', component: CollectionsComponent },
+  { path: 'students', component: StudentsComponent },
+  { path: 'overdue-charges', component: OverdueChargesComponent }
+];
+
+
+---
+
+9. Ensure <router-outlet> is in app.component.html
+
+<app-header></app-header>
+<div class="layout-container">
+  <app-sidebar></app-sidebar>
+  <div class="main-content">
+    <router-outlet></router-outlet>
+  </div>  
+</div>
+
+
+---
+
+10. Restart Angular Server
+
+Run:
+
+ng serve --open
+
+
+---
+
+Final Fixes Implemented ✅
+
+✔ Created TableComponent to reuse tables
+✔ Updated StudentsComponent to use <app-table>
+✔ Created OverdueChargesComponent to show overdue charges in the same table format
+✔ Modified routing to show the correct table on clicking "Overdue Charges"
+✔ Updated sidebar navigation to enable the link
+
+🚀 Now, clicking "Overdue Charges" will display the table with the correct overdue charge details without creating a separate table!
+
+Let me know if you need further modifications!
+
