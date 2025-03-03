@@ -1,0 +1,162 @@
+To modify your code so that clicking on the "Students" icon in the sidebar displays the student table, follow these steps:
+
+
+---
+
+1. Update Sidebar Navigation (sidebar.component.html)
+
+Ensure that the "Students" menu item has the correct routerLink:
+
+<li><a routerLink="/students" routerLinkActive="active"><i class="fa fa-user-graduate"></i> Students</a></li>
+
+
+---
+
+2. Define the Students Component
+
+Run this command to generate the StudentsComponent (if not created already):
+
+ng generate component students --standalone
+
+Then, modify students.component.ts to match the UI from the image:
+
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-students',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './students.component.html',
+  styleUrls: ['./students.component.css']
+})
+export class StudentsComponent {
+  students = [
+    { name: 'Neha Mishra', prn: 'MITU22BFAAT035', dept: 'SoFA', email: 'nehamishra@gmail.com', phone: '9254876325', registrationDate: '30 Jul, 2024', imageUrl: 'https://randomuser.me/api/portraits/women/1.jpg' },
+    { name: 'Gejasvi Dewhare', prn: 'MITU23BFAAT021', dept: 'SoFA', email: 'geju28@gmail.com', phone: '9325349875', registrationDate: '28 Jul, 2024', imageUrl: 'https://randomuser.me/api/portraits/women/2.jpg' },
+    { name: 'Ayushi Dawande', prn: 'MITU21BFAAT035', dept: 'SoFA', email: 'dawande17@gmail.com', phone: '8854216378', registrationDate: '28 Jul, 2024', imageUrl: 'https://randomuser.me/api/portraits/women/3.jpg' },
+    { name: 'Ronak Shukla', prn: 'MITU231ODAT001', dept: 'IoD', email: 'ronnieshukla@gmail.com', phone: '3426598715', registrationDate: '20 Jul, 2024', imageUrl: 'https://randomuser.me/api/portraits/men/1.jpg' },
+    { name: 'Yash Kori', prn: 'MITU22VSKAT091', dept: 'VSK', email: 'yashkori@gmail.com', phone: '9885316587', registrationDate: '14 Jul, 2024', imageUrl: 'https://randomuser.me/api/portraits/men/2.jpg' }
+  ];
+}
+
+
+---
+
+3. Create Student Table UI (students.component.html)
+
+<div class="students-container">
+  <h2>Student Accounts</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>PRN No.</th>
+        <th>Dept</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Registration Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let student of students">
+        <td>
+          <img [src]="student.imageUrl" class="student-img">
+          {{ student.name }}
+        </td>
+        <td>{{ student.prn }}</td>
+        <td>{{ student.dept }}</td>
+        <td>{{ student.email }}</td>
+        <td>{{ student.phone }}</td>
+        <td>{{ student.registrationDate }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+---
+
+4. Style the Table (students.component.css)
+
+.students-container {
+  padding: 20px;
+  background-color: #f5e1ff;
+  min-height: 100vh;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.student-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+
+---
+
+5. Update Router Configuration (app.routes.ts)
+
+import { Routes } from '@angular/router';
+import { MainContentComponent } from './main-content/main-content.component';
+import { CollectionsComponent } from './collections/collections.component';
+import { StudentsComponent } from './students/students.component';
+
+export const routes: Routes = [
+  { path: '', component: MainContentComponent },
+  { path: 'collections', component: CollectionsComponent },
+  { path: 'students', component: StudentsComponent }
+];
+
+
+---
+
+6. Ensure RouterOutlet is in app.component.html
+
+<app-header></app-header>
+<div class="layout-container">
+  <app-sidebar></app-sidebar>
+  <div class="main-content">
+    <router-outlet></router-outlet>
+  </div>  
+</div>
+
+
+---
+
+7. Restart Your Angular Server
+
+Run the following command to restart your server and apply changes:
+
+ng serve --open
+
+
+---
+
+✅ Final Fixes Implemented
+
+✔ Created StudentsComponent
+✔ Updated routing to include /students
+✔ Modified sidebar navigation to link to /students
+✔ Ensured <router-outlet> dynamically loads content
+
+🚀 Now, when you click "Students" in the sidebar, the student table should appear! Let me know if you need any changes.
+
