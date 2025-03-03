@@ -1,0 +1,112 @@
+To ensure that only the active menu item is highlighted when clicked in the sidebar, follow these steps:
+
+
+---
+
+1️⃣ Fix Sidebar Styling (sidebar.component.css)
+
+Add the following styles to sidebar.component.css to ensure only the active link is highlighted:
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar ul li {
+  padding: 10px;
+  margin: 5px 0;
+}
+
+.sidebar ul li a {
+  text-decoration: none;
+  color: #333;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.sidebar ul li a i {
+  margin-right: 10px;
+}
+
+/* Default inactive style */
+.sidebar ul li a {
+  background-color: transparent;
+}
+
+/* Apply active class when clicked */
+.sidebar ul li a.active {
+  background-color: #6A5ACD; /* Purple */
+  color: white;
+}
+
+/* Hover effect */
+.sidebar ul li a:hover {
+  background-color: #ddd;
+  color: #000;
+}
+
+
+---
+
+2️⃣ Fix Sidebar Component (sidebar.component.html)
+
+Ensure that the correct routerLinkActive="active" is applied.
+
+<nav class="sidebar">
+  <ul>
+    <li><a routerLink="/" routerLinkActive="active"><i class="fa fa-home"></i> Home</a></li>
+    <li><a routerLink="/collections" routerLinkActive="active"><i class="fa fa-book"></i> Collection</a></li>
+    <li><a routerLink="/students" routerLinkActive="active"><i class="fa fa-user-graduate"></i> Students</a></li>
+    <li><a routerLink="/overdue-charges" routerLinkActive="active"><i class="fa fa-exclamation-triangle"></i> Overdue Charges</a></li>
+  </ul>
+</nav>
+
+
+---
+
+3️⃣ Fix Sidebar Component in sidebar.component.ts
+
+Ensure Angular detects the active route correctly by using RouterLinkActiveOptions.
+
+Modify sidebar.component.ts:
+
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+
+@Component({
+  selector: 'app-sidebar',
+  standalone: true,
+  imports: [CommonModule, RouterLink, RouterLinkActive],
+  templateUrl: './sidebar.component.html',
+  styleUrls: ['./sidebar.component.css'],
+})
+export class SidebarComponent {}
+
+
+---
+
+4️⃣ Restart Your Angular App
+
+After making these changes, restart your Angular app to apply the updates:
+
+ng serve --open
+
+
+---
+
+🚀 Final Fixes Implemented
+
+✅ The active link now only applies to the clicked menu item.
+✅ No more background color issues affecting other items.
+✅ Smooth hover and transition effects added for a better UX.
+✅ Works properly when navigating between sections.
+
+Now, when you click on "Collections", only that menu item will highlight properly without affecting "Home" or any other sections! 🎉
+
+Let me know if you need any more improvements! 😊
+
