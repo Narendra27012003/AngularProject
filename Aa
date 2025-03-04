@@ -1,0 +1,683 @@
+Below is a final complete solution that integrates additional functionalities for your stock inventory section. This version includes:
+
+Filtering and Sorting:
+A search box plus column filtering/sorting logic that applies to the inventory table.
+
+Pagination:
+Controls to navigate through pages.
+
+Create/Edit Task (Modal):
+A modal that appears when you click “Create New Task” (or the edit icon next to a row) that lets you add or modify an inventory item.
+
+
+Below are the three files you’ll need to update: the TypeScript file, the HTML template, and the CSS.
+
+
+---
+
+1. stock-management.component.ts
+
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { StockManagementService, StockItem, SummaryItem } from '../services/stock-management.service';
+import * as Highcharts from 'highcharts';
+import { HighchartsChartModule } from 'highcharts-angular';
+import { HighchartsComponent } from '../highcharts/highcharts.component';
+
+@Component({
+  selector: 'app-stock-management',
+  standalone: true,
+  imports: [CommonModule, FormsModule, HighchartsChartModule, HighchartsComponent],
+  templateUrl: './stock-management.component.html',
+  styleUrls: ['./stock-management.component.css']
+})
+export class StockManagementComponent implements OnInit {
+  // Summary Data (2x2 grid: Orders, Profit/Loss, Sales, Customenrs)
+  stockSummary: SummaryItem[] = [];
+
+  // Inventory Data
+  stockList: StockItem[] = [];
+  filteredStockList: StockItem[] = [];
+
+  // Pagination
+  currentPage = 1;
+  itemsPerPage = 10;
+
+  // Sorting and Filtering
+  sortColumn: string = 'customentName';
+  sortDirection: 'asc' | 'desc' = 'asc';
+  filterColumn: string = 'customentName';
+  filterText: string = '';
+  searchQuery: string = '';
+
+  // Modal for Create/Edit Task
+  showEditModal = false;
+  isEditMode = false;
+  editData: Partial<StockItem> = {};
+
+  // Full-screen table toggle
+  showFullTable = false;
+
+  // Highcharts
+  Highcharts: typeof Highcharts = Highcharts;
+  chartOptions: Highcharts.Options = {};
+
+  constructor(private stockService: StockManagementService) {}
+
+  ngOnInit(): void {
+    // Fetch complete data from the JSON file via service.
+    this.stockService.getStockData().subscribe({
+      next: (res) => {
+        this.stockSummary = res.stockInventorySummary || [];
+        this.stockList = res.stockInventoryList || [];
+        this.filteredStockList = [...this.stockList];
+        this.applySearchFilter();
+
+        // Load chart data; use dummy data if none is provided.
+        const chartData = res.stockInventoryOrdersChartData || [
+          { date: '2025-01-01T00:00:00Z', numOfAvailableStock: 100, numOfUnvailableStock: 20 },
+          { date: '2025-02-01T00:00:00Z', numOfAvailableStock: 150, numOfUnvailableStock: 30 },
+          { date: '2025-03-01T00:00:00Z', numOfAvailableStock: 200, numOfUnvailableStock: 50 }
+        ];
+        this.loadChart(chartData);
+      },
+      error: (err) => console.error('Error fetching stock data:', err)
+    });
+  }
+
+  // Highcharts configuration method
+  loadChart(chartData: any): void {
+    const categories = chartData.map((data: any) => {
+      const d = new Date(data.date);
+      return d.toLocaleString('default', { month: 'short' });
+    });
+
+    this.chartOptions = {
+      chart: { type: 'column' },
+      title: { text: 'Total Orders' },
+      xAxis: { categories },
+      yAxis: { title: { text: 'Orders Count' } },
+      series: [
+        {
+          name: 'Available',
+          type: 'column',
+          data: chartData.map((data: any) => data.numOfAvailableStock)
+        },
+        {
+          name: 'Out of Stock',
+          type: 'column',
+          data: chartData.map((data: any) => data.numOfUnvailableStock)
+        }
+      ]
+    };
+  }
+
+  // Filtering: Search box
+  applySearchFilter(): void {
+    const query = this.searchQuery.toLowerCase().trim();
+    this.filteredStockList = this.stockList.filter(item =>
+      item.customentName.toLowerCase().includes(query) ||
+      item.product.toLowerCase().includes(query) ||
+      item.cashier.toLowerCase().includes(query)
+    );
+    this.applyColumnFilter();
+    this.applySorting();
+    this.currentPage = 1;
+  }
+
+  // Filtering: Column filter (if filterText is provided)
+  applyColumnFilter(): void {
+    if (!this.filterText.trim()) return;
+    this.filteredStockList = this.filteredStockList.filter(item => {
+      const val = (item as any)[this.filterColumn]?.toString().toLowerCase() || '';
+      return val.includes(this.filterText.toLowerCase());
+    });
+  }
+
+  // Sorting function
+  applySorting(): void {
+    this.filteredStockList.sort((a, b) => {
+      const valA = (a as any)[this.sortColumn];
+      const valB = (b as any)[this.sortColumn];
+      if (valA < valB) return this.sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return this.sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  // Pagination helpers
+  get totalPages(): number {
+    return Math.ceil(this.filteredStockList.length / this.itemsPerPage);
+  }
+
+  get pagedData(): StockItem[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredStockList.slice(startIndex, startIndex + this.itemsPerPage);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  // Toggle full-screen mode for the table
+  toggleViewAll(): void {
+    this.showFullTable = !this.showFullTable;
+  }
+
+  // Open modal for Create New Task or Edit Task
+  openEditModal(item?: StockItem): void {
+    this.showEditModal = true;
+    if (item) {
+      // Edit mode: pre-populate modal with item data.
+      this.isEditMode = true;
+      this.editData = { ...item };
+    } else {
+      // Create mode: initialize an empty record.
+      this.isEditMode = false;
+      this.editData = {
+        customentName: '',
+        product: '',
+        supplier: '',
+        dateOfEntry: '',
+        quantity: 0,
+        price: 0,
+        sellingPrice: 0,
+        cashier: '',
+        status: 'pending'
+      };
+    }
+  }
+
+  // Close the modal
+  closeModal(): void {
+    this.showEditModal = false;
+  }
+
+  // Save data from modal (edit or create new)
+  saveData(): void {
+    if (this.isEditMode) {
+      // Find the existing item and update it.
+      const idx = this.stockList.findIndex(
+        s => s.customentName === this.editData.customentName && s.product === this.editData.product
+      );
+      if (idx !== -1 && this.editData) {
+        this.stockList[idx] = this.editData as StockItem;
+      }
+    } else {
+      // Prepend the new item to the stock list.
+      this.stockList.unshift(this.editData as StockItem);
+    }
+    // Refresh the filtered list, reapply search/filter, and reset modal.
+    this.filteredStockList = [...this.stockList];
+    this.applySearchFilter();
+    this.showEditModal = false;
+  }
+}
+
+
+---
+
+4. stock-management.component.html
+
+<div class="stock-management-container">
+  <!-- Top Controls: Filter/Sort & Create Task -->
+  <div class="top-controls">
+    <div class="filter-sort-controls">
+      <label for="sortCriteria">Sort By:</label>
+      <select id="sortCriteria" [(ngModel)]="sortColumn" (change)="applySorting()">
+        <!-- Adjust keys as needed -->
+        <option value="onDemand">On Demand Products</option>
+        <option value="product">Product Name</option>
+        <option value="customentName">Customer Name</option>
+      </select>
+      <select [(ngModel)]="sortDirection" (change)="applySorting()">
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+      </select>
+      <input
+        type="text"
+        placeholder="Search..."
+        [(ngModel)]="searchQuery"
+        (input)="applySearchFilter()"
+      />
+    </div>
+    <div class="create-task-control">
+      <button class="create-btn" (click)="openEditModal()">Create New Task</button>
+    </div>
+  </div>
+
+  <!-- Overview Analysis Title -->
+  <h3 class="page-title">Overview Analysis</h3>
+
+  <!-- Summary & Chart Section (Side by Side) -->
+  <div class="summary-chart-section">
+    <!-- Summary Section (2x2 Grid) -->
+    <div class="summary-section">
+      <!-- The order of stockSummary should be:
+           1) Orders, 2) Profit/Loss, 3) Sales, 4) Customenrs -->
+      <div *ngFor="let item of stockSummary" class="summary-card">
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.units }} Units</p>
+        <span [ngClass]="{'positive': item.status > 0, 'negative': item.status < 0}" class="status">
+          {{ item.status | number:'1.2-2' }}%
+        </span>
+      </div>
+    </div>
+    <!-- Graph Section (on the right) -->
+    <div class="graph-section">
+      <app-highcharts></app-highcharts>
+    </div>
+  </div>
+
+  <!-- Stock Inventory Section -->
+  <div class="inventory-section">
+    <h3 class="section-title">Stock Inventory</h3>
+    <button class="view-all-btn" (click)="toggleViewAll()">View All</button>
+
+    <div class="table-container" [class.full-screen]="showFullTable">
+      <table>
+        <thead>
+          <tr>
+            <th class="sticky-left">Consumer</th>
+            <th>Product</th>
+            <th>Supplier</th>
+            <th>Date of Entry</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Selling Price</th>
+            <th>Cashier</th>
+            <th class="sticky-right">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of pagedData">
+            <td class="sticky-left">{{ item.customentName }}</td>
+            <td>{{ item.product }}</td>
+            <td>{{ item.supplier }}</td>
+            <td>{{ item.dateOfEntry ? (item.dateOfEntry | date:'dd MMM yyyy') : '—' }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>₹ {{ item.price }}</td>
+            <td>₹ {{ item.sellingPrice }}</td>
+            <td>{{ item.cashier }}</td>
+            <td class="sticky-right">
+              <span class="status-label" [ngClass]="item.status">{{ item.status }}</span>
+              <button class="edit-btn" (click)="openEditModal(item)">
+                <i class="fa fa-edit"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination">
+      <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Prev</button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+    </div>
+  </div>
+
+  <!-- Edit / Create Modal -->
+  <div class="modal-backdrop" *ngIf="showEditModal">
+    <div class="modal">
+      <h2 *ngIf="isEditMode">Edit Stock</h2>
+      <h2 *ngIf="!isEditMode">Create New Task/Stock</h2>
+
+      <div class="form-group">
+        <label>Consumer</label>
+        <input [(ngModel)]="editData.customentName" placeholder="Consumer Name" />
+      </div>
+      <div class="form-group">
+        <label>Product</label>
+        <input [(ngModel)]="editData.product" placeholder="Product" />
+      </div>
+      <div class="form-group">
+        <label>Supplier</label>
+        <input [(ngModel)]="editData.supplier" placeholder="Supplier" />
+      </div>
+      <div class="form-group">
+        <label>Date of Entry</label>
+        <input type="date" [(ngModel)]="editData.dateOfEntry" />
+      </div>
+      <div class="form-group">
+        <label>Quantity</label>
+        <input type="number" [(ngModel)]="editData.quantity" placeholder="Quantity" />
+      </div>
+      <div class="form-group">
+        <label>Price</label>
+        <input type="number" [(ngModel)]="editData.price" placeholder="Price" />
+      </div>
+      <div class="form-group">
+        <label>Selling Price</label>
+        <input type="number" [(ngModel)]="editData.sellingPrice" placeholder="Selling Price" />
+      </div>
+      <div class="form-group">
+        <label>Cashier</label>
+        <input [(ngModel)]="editData.cashier" placeholder="Cashier Name" />
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select [(ngModel)]="editData.status">
+          <option value="completed">completed</option>
+          <option value="closed">closed</option>
+          <option value="failed">failed</option>
+          <option value="pending">pending</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button (click)="closeModal()">Cancel</button>
+        <button (click)="saveData()">{{ isEditMode ? 'Save' : 'Create' }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+---
+
+5. Updated CSS (stock-management.component.css)
+
+/* Global Container */
+.stock-management-container {
+  padding: 16px;
+  font-family: 'Roboto', sans-serif;
+  color: #333;
+}
+
+/* -------------------------- */
+/* Top Controls: Filter/Sort & Create Task */
+/* -------------------------- */
+.top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.filter-sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.filter-sort-controls label {
+  font-size: 0.9rem;
+  color: #333;
+}
+.filter-sort-controls select,
+.filter-sort-controls input {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.create-task-control {
+  /* Right aligned */
+}
+.create-btn {
+  background-color: #3f51b5;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.create-btn:hover {
+  background-color: #2c3992;
+}
+
+/* -------------------------- */
+/* Page Title */
+.page-title {
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+/* -------------------------- */
+/* Summary & Chart Section: Side by Side */
+/* -------------------------- */
+.summary-chart-section {
+  display: flex;
+  flex-direction: row; /* side by side */
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+/* Summary Section: 2x2 Grid */
+.summary-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Two columns for four cards */
+  gap: 20px;
+  flex: 1;
+}
+.summary-card {
+  background: #f9f9f9;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.summary-card h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  color: #444;
+}
+.summary-card p {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  color: #666;
+}
+.status {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.positive {
+  color: green;
+}
+.negative {
+  color: red;
+}
+
+/* Graph Section */
+.graph-section {
+  flex: 1.5;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  box-sizing: border-box;
+  min-width: 400px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* -------------------------- */
+/* Inventory Section */
+.inventory-section {
+  margin-top: 20px;
+}
+.section-title {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  color: #333;
+}
+.view-all-btn {
+  margin-bottom: 10px;
+  background-color: #3f51b5;
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Table Container */
+.table-container {
+  overflow-x: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+.table-container.full-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  z-index: 9999;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Table Styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+th,
+td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+}
+.sticky-left {
+  position: sticky;
+  left: 0;
+  background-color: #fff;
+  z-index: 2;
+}
+.sticky-right {
+  position: sticky;
+  right: 0;
+  background-color: #fff;
+  z-index: 2;
+}
+
+/* -------------------------- */
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+.pagination button {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.pagination button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* -------------------------- */
+/* Modal Styles */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.modal {
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  width: 500px;
+  max-width: 90%;
+}
+.modal h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+.form-group {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.form-group input,
+.form-group select {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+.modal-actions button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+.modal-actions button:first-child {
+  background-color: #ccc;
+  color: #333;
+}
+.modal-actions button:last-child {
+  background-color: #3f51b5;
+  color: #fff;
+}
+
+
+---
+
+Summary
+
+1. TypeScript File:
+
+Contains properties and methods for filtering, sorting, pagination, and modal (create/edit) functionalities.
+
+The modal opens (via openEditModal) either in edit mode (if an item is passed) or in create mode (empty fields).
+
+The saveData method updates or adds to the inventory list.
+
+
+
+2. HTML Template:
+
+The top controls now include filter/sort/search and a Create New Task button.
+
+The summary section is arranged in a 2×2 grid (with the order defined in your JSON data).
+
+The graph is displayed beside the summary section.
+
+The inventory table is shown below with pagination.
+
+A modal appears for creating/editing tasks.
+
+
+
+3. CSS:
+
+Provides layout for the top controls, summary/chart section (side by side), inventory table, pagination, and modal.
+
+The "View All" button toggles full-screen view for the table.
+
+
+
+
+This final solution should add the missing functionalities to your stock inventory section. Adjust any labels, spacing, or logic as needed for your specific data and design. Let me know if you have further questions or need additional modifications!
+
